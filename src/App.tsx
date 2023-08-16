@@ -9,6 +9,8 @@ function App() {
     const [total, setTotal] = useState<number>(0);
     const [error, setError] = useState<string | null>(null);
 
+
+    //Fetching Data from API
     useEffect(() => {
         fetch('https://my-json-server.typicode.com/benirvingplt/products/products')
             .then(response => {
@@ -27,7 +29,7 @@ function App() {
             });
     }, []);
 
-
+    //Handling any changes to overall total
     useEffect(() => {
         let newTotal = 0;
         for (const productId in basket) {
@@ -38,6 +40,11 @@ function App() {
         }
         setTotal(newTotal);
     }, [basket, products]);
+
+    /**
+     * 
+     * @param productId {number}
+     */
 
     const handleAddToBasket = (productId: number) => {
         setBasket(prevBasket => ({
@@ -66,6 +73,8 @@ function App() {
         setColorFilter(selectedColor);
     };
 
+
+    //Displaying products based on the filter selected
     const filteredProducts = colorFilter
         ? products.filter(product => product.colour === colorFilter)
         : products;
