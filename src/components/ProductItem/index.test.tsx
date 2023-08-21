@@ -1,27 +1,39 @@
-import { render, screen, fireEvent } from '@testing-library/react';
-import ProductItem from '.';
+import { render, fireEvent } from "@testing-library/react";
+import ProductItem from ".";
 
-describe('ProductItem', () => {
-  const mockProduct = {
+test("renders product item and triggers basket interactions", () => {
+  const product = {
     id: 1,
-    img: 'image.jpg',
-    name: 'Product Name',
-    price: 10.99,
-    colour: 'Red',
+    colour: "red",
+    name: "Product A",
+    price: 10,
+    img: "",
   };
+  const mockAdd = jest.fn();
+  const mockRemove = jest.fn();
+  const mockRemoveAll = jest.fn();
 
-  it('renders product information', () => {
-    render(<ProductItem product={mockProduct} onAddToBasket={() => {}} onRemoveFromBasket={() => {}} onRemoveAllFromBasket={() => {}} basketQuantity={0} />);
-    
-    expect(screen.getByText('Product Name')).toBeInTheDocument();
-    expect(screen.getByText('Price: $10.99')).toBeInTheDocument();
-  });
+  const { getByText, getByAltText } = render(
+    <ProductItem
+      product={product}
+      onAddToBasket={mockAdd}
+      onRemoveFromBasket={mockRemove}
+      onRemoveAllFromBasket={mockRemoveAll}
+      basketQuantity={1}
+    />,
+  );
 
-  it('calls onAddToBasket when + button is clicked', () => {
-    const mockAddToBasket = jest.fn();
-    render(<ProductItem product={mockProduct} onAddToBasket={mockAddToBasket} onRemoveFromBasket={() => {}} onRemoveAllFromBasket={() => {}} basketQuantity={0} />);
-    
-    fireEvent.click(screen.getByText('+'));
-    expect(mockAddToBasket).toHaveBeenCalledWith(1);
-  });
+  const addButton = getByText("+");
+  fireEvent.click(addButton);
+  expect(mockAdd).toHaveBeenCalledWith(1);
+
+  const removeButton = getByText("-");
+  fireEvent.click(removeButton);
+  expect(mockRemove).toHaveBeenCalledWith(1);
+
+  const removeAllButton = getByText("Remove");
+  fireEvent.click(removeAllButton);
+  expect(mockRemoveAll).toHaveBeenCalledWith(1);
+
+  expect(getByAltText("Product A")).toBeInTheDocument();
 });
