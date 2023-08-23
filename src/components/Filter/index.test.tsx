@@ -1,44 +1,51 @@
-import { render, screen, fireEvent } from "@testing-library/react";
-import Filter from ".";
+import { fireEvent, render } from '@testing-library/react';
+import Filter from '.';
 
-describe("Filter", () => {
-  const mockProducts = [
-    {
-      id: 1,
-      img: "image1.jpg",
-      name: "Product 1",
-      price: 10.99,
-      colour: "Red",
-    },
-    {
-      id: 2,
-      img: "image2.jpg",
-      name: "Product 2",
-      price: 15.99,
-      colour: "Blue",
-    },
-  ];
+describe('Filter Component', () => {
+    const mockOnColorFilterChange = jest.fn();
 
-  it("renders filter options", () => {
-    render(<Filter onColorFilterChange={() => {}} products={mockProducts} />);
+    it('renders correctly', () => {
+        const products = [
+            { id: 1, img: '', name: '', price: 0, colour: 'blue' },
+            { id: 2, img: '', name: '', price: 0, colour: 'red' }
+        ];
+        
+        const { getByText } = render(
+            <Filter products={products} onColorFilterChange={mockOnColorFilterChange} />
+        );
 
-    expect(screen.getByText("All Colors")).toBeInTheDocument();
-    expect(screen.getByText("Red")).toBeInTheDocument();
-    expect(screen.getByText("Blue")).toBeInTheDocument();
-  });
-
-  it("calls onColorFilterChange with selected color", () => {
-    const mockColorFilterChange = jest.fn();
-    render(
-      <Filter
-        onColorFilterChange={mockColorFilterChange}
-        products={mockProducts}
-      />,
-    );
-
-    fireEvent.change(screen.getByLabelText("Filter by Color:"), {
-      target: { value: "Red" },
+        expect(getByText('Filter by Color:')).toBeInTheDocument();
+        expect(getByText('All Colors')).toBeInTheDocument();
     });
-    expect(mockColorFilterChange).toHaveBeenCalledWith("Red");
-  });
+
+    it('lists unique colors', () => {
+        const products = [
+            { id: 1, img: '', name: '', price: 0, colour: 'blue' },
+            { id: 2, img: '', name: '', price: 0, colour: 'red' },
+            { id: 3, img: '', name: '', price: 0, colour: 'blue' }
+        ];
+        
+        const { getByText, queryAllByText } = render(
+            <Filter products={products} onColorFilterChange={mockOnColorFilterChange} />
+        );
+
+        expect(getByText('blue')).toBeInTheDocument();
+        expect(getByText('red')).toBeInTheDocument();
+        expect(queryAllByText('blue').length).toBe(1);
+    });
+
+    it('calls onColorFilterChange with the correct value', () => {
+        const products = [
+            { id: 1, img: '', name: '', price: 0, colour: 'blue' },
+            { id: 2, img: '', name: '', price: 0, colour: 'red' }
+        ];
+
+        const { getByText } = render(
+            <Filter products={products} onColorFilterChange={mockOnColorFilterChange} />
+        );
+
+        fireEvent.change(getByText('All Colors').parentElement!, { target: { value: 'red' } });
+        
+        expect(mockOnColorFilterChange).toHaveBeenCalledWith('red');
+    });
 });

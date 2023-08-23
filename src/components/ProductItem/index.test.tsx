@@ -1,39 +1,55 @@
-import { render, fireEvent } from "@testing-library/react";
-import ProductItem from ".";
+import { configureStore } from '@reduxjs/toolkit';
+import { fireEvent, render } from '@testing-library/react';
+import { Provider } from 'react-redux';
+import cartReducer, { addToCart } from '../../redux/cartSlice'; // Update with your actual path
+import ProductItem from '.';
 
-test("renders product item and triggers basket interactions", () => {
-  const product = {
-    id: 1,
-    colour: "red",
-    name: "Product A",
-    price: 10,
-    img: "",
-  };
-  const mockAdd = jest.fn();
-  const mockRemove = jest.fn();
-  const mockRemoveAll = jest.fn();
+describe('ProductItem Component', () => {
+    const mockProduct = {
+        id: 1,
+        img: 'path_to_image.jpg',
+        name: 'Sample Product',
+        price: 100,
+        colour: 'blue'
+    };
+    
+    const store = configureStore({
+        reducer: {
+            cart: cartReducer
+        }
+    });
 
-  const { getByText, getByAltText } = render(
-    <ProductItem
-      product={product}
-      onAddToBasket={mockAdd}
-      onRemoveFromBasket={mockRemove}
-      onRemoveAllFromBasket={mockRemoveAll}
-      basketQuantity={1}
-    />,
-  );
+    it('renders correctly', () => {
+        const { getByText, getByAltText } = render(
+            <Provider store={store}>
+                <ProductItem product={mockProduct} />
+            </Provider>
+        );
 
-  const addButton = getByText("+");
-  fireEvent.click(addButton);
-  expect(mockAdd).toHaveBeenCalledWith(1);
+        expect(getByText('Sample Product')).toBeInTheDocument();
+        expect(getByAltText('Sample Product')).toHaveAttribute('src', 'path_to_image.jpg');
+        expect(getByText('Price: $100.00')).toBeInTheDocument();
+    });
 
-  const removeButton = getByText("-");
-  fireEvent.click(removeButton);
-  expect(mockRemove).toHaveBeenCalledWith(1);
+    it('handles quantity increment and decrement', () => {
+        const { getByText } = render(
+            <Provider store={store}>
+                <ProductItem product={mockProduct} />
+            </Provider>
+        );
 
-  const removeAllButton = getByText("Remove");
-  fireEvent.click(removeAllButton);
-  expect(mockRemoveAll).toHaveBeenCalledWith(1);
+        expect(getByText('Quantity: 1')).toBeInTheDocument();
 
-  expect(getByAltText("Product A")).toBeInTheDocument();
+        const addButton = getByText('+');
+        const subtractButton = getByText('-');
+
+        fireEvent.click(addButton);
+        expect(getByText('Quantity: 2')).toBeInTheDocument();
+
+        fireEvent.click(subtractButton);
+        expect(getByText('Quantity: 1')).toBeInTheDocument();
+
+        fireEvent.click(subtractButton);
+        expect(getByText('Quantity: 1')).toBeInTheDocument();
+    });
 });
