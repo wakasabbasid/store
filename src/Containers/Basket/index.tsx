@@ -14,7 +14,7 @@ const Basket = () => {
         <div className='p-4'>
             <div className='flex justify-between'>
                 <Link to={"/"} className="flex hover:bg-gray-300 h-14 w-14 rounded-xl justify-center">
-                    <img src={backBtn} alt="Back" width={30} height={30} />
+                    <img src={backBtn} alt="Backbutton" width={30} height={30} />
                 </Link>
                 <div className='flex justify-between gap-x-2'>
                     <p className="text-4xl font-bold mb-6 text-center text-green-600">Shopping Cart</p>
@@ -30,7 +30,7 @@ const Basket = () => {
                     />)
                 ) : (
                     <div className='flex justify-center'>
-                        <img src={emptyCart} />
+                        <img alt="emptyCart" src={emptyCart} />
                     </div>
                 )
             }
