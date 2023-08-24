@@ -1,35 +1,35 @@
 interface Product {
-    id: number;
-    img: string;
-    name: string;
-    price: number;
-    colour: string;
-    quantity?: number;
+  id: number;
+  img: string;
+  name: string;
+  price: number;
+  colour: string;
+  quantity?: number;
 }
 
 interface ProductItemProps {
-    product: Product;
+  product: Product;
 }
 
 interface ProductListProps {
-    products: Product[];
-    colorFilter: string;
-    handleColorFilterChange: (selectedColor: string) => void;
+  products: Product[];
+  colorFilter: string;
+  handleColorFilterChange: (selectedColor: string) => void;
 }
 
 interface ProductQuantity {
-    [productId: number]: number;
+  [productId: number]: number;
 }
 
 interface FilterProps {
-    onColorFilterChange: (selectedColor: string) => void;
-    products: Product[];
+  onColorFilterChange: (selectedColor: string) => void;
+  products: Product[];
 }
 
 interface ProductsSlice {
-    products: Product[]
+  products: Product[];
 }
 
 interface CartSlice {
-    items: Product[]
+  items: Product[];
 }

@@ -1,55 +1,55 @@
-import { configureStore } from '@reduxjs/toolkit';
-import { fireEvent, render } from '@testing-library/react';
-import { Provider } from 'react-redux';
-import cartReducer, { addToCart } from '../../redux/cartSlice'; // Update with your actual path
-import ProductItem from '.';
+import { configureStore } from "@reduxjs/toolkit";
+import { fireEvent, render } from "@testing-library/react";
+import { Provider } from "react-redux";
+import ProductItem from ".";
+import cartReducer from "../../redux/cartSlice";
 
-describe('ProductItem Component', () => {
-    const mockProduct = {
-        id: 1,
-        img: 'path_to_image.jpg',
-        name: 'Sample Product',
-        price: 100,
-        colour: 'blue'
-    };
-    
-    const store = configureStore({
-        reducer: {
-            cart: cartReducer
-        }
-    });
+describe("ProductItem Component", () => {
+  const mockProduct = {
+    id: 1,
+    img: "path_to_image.jpg",
+    name: "Sample Product",
+    price: 100,
+    colour: "blue",
+  };
 
-    it('renders correctly', () => {
-        const { getByText, getByAltText } = render(
-            <Provider store={store}>
-                <ProductItem product={mockProduct} />
-            </Provider>
-        );
+  const store = configureStore({
+    reducer: {
+      cart: cartReducer,
+    },
+  });
 
-        expect(getByText('Sample Product')).toBeInTheDocument();
-        expect(getByAltText('Sample Product')).toHaveAttribute('src', 'path_to_image.jpg');
-        expect(getByText('Price: $100.00')).toBeInTheDocument();
-    });
+  beforeEach(() => {
+    jest.clearAllMocks();
+  });
 
-    it('handles quantity increment and decrement', () => {
-        const { getByText } = render(
-            <Provider store={store}>
-                <ProductItem product={mockProduct} />
-            </Provider>
-        );
+  it("renders correctly", () => {
+    const { getByText, getByAltText } = render(
+      <Provider store={store}>
+        <ProductItem product={mockProduct} />
+      </Provider>,
+    );
 
-        expect(getByText('Quantity: 1')).toBeInTheDocument();
+    expect(getByText("Sample Product")).toBeInTheDocument();
+    expect(getByAltText("Sample Product")).toHaveAttribute(
+      "src",
+      "path_to_image.jpg",
+    );
+    expect(getByText("Price: $100.00")).toBeInTheDocument();
+  });
 
-        const addButton = getByText('+');
-        const subtractButton = getByText('-');
+  it('dispatches addToCart action when "Add to cart" button is clicked', () => {
+    const { getByRole } = render(
+      <Provider store={store}>
+        <ProductItem product={mockProduct} />
+      </Provider>,
+    );
 
-        fireEvent.click(addButton);
-        expect(getByText('Quantity: 2')).toBeInTheDocument();
+    const addToCartButton = getByRole("button", { name: /Add to cart/i });
+    fireEvent.click(addToCartButton);
 
-        fireEvent.click(subtractButton);
-        expect(getByText('Quantity: 1')).toBeInTheDocument();
-
-        fireEvent.click(subtractButton);
-        expect(getByText('Quantity: 1')).toBeInTheDocument();
-    });
+    expect(store.getState().cart.items).toEqual([
+      { ...mockProduct, quantity: 1 },
+    ]);
+  });
 });
